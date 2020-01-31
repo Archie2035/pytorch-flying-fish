@@ -6,10 +6,13 @@ import torchvision.transforms as transforms
 import torch.optim as optim
 
 import numpy as np
+from tqdm import tqdm
 
 import matplotlib.pyplot as plt
 
 torch.manual_seed(666)
+epoch = 4
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 transform = transforms.Compose(
     [transforms.ToTensor(),
@@ -34,13 +37,19 @@ def show_img(img):
 
 
 def show_case():
+    print("=========================================")
+    print("first mini_batch training data and labels")
     dataiter = iter(trainloader)
     images, labels = dataiter.next()
-    for i in labels:
-        print(classes[i])
+    label_info = [classes[i] for i in labels]
+    print("label: {}".format(label_info))
+    print("=========================================")
     show_img(torchvision.utils.make_grid(images))
 
 
+def show_info(net, device):
+    print("device is: {}".format(device))
+    print("net: {}".format(net))
 
 
 class Net(nn.Module):
@@ -64,21 +73,23 @@ class Net(nn.Module):
         return x
 
 
-def solver():
-    net = Net()
+def solver(show_label=False):
+    if show_label:
+        show_case()
 
-    print(net)
-    # show_case()
+    net = Net()
+    net.to(device)
+
+    show_info(net, device)
 
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
-
-    epoch = 4
-
-    for index in range(epoch):
+    bar = tqdm(range(epoch))
+    for index in bar:
         i = 0
         for data in trainloader:
             inputs, labels = data
+            inputs, labels = inputs.to(device), labels.to(device)
             optimizer.zero_grad()
 
             output = net(inputs)
@@ -87,13 +98,14 @@ def solver():
             optimizer.step()
             i += 1
             if i % 100 == 0:
-                print("epoch: {}, index: {}, loss: {}".format(index, i, loss))
+                bar.set_description("epoch: {}, index: {}, loss: {}".format(index, i, loss))
 
     correct = 0
     total = 0
     with torch.no_grad():
         for data in testloader:
             inputs, labels = data
+            inputs, labels = inputs.to(device), labels.to(device)
             outputs = net(inputs)
             _, predicted = torch.max(outputs.data, 1)
             total += labels.size(0)
