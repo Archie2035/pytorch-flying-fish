@@ -4,14 +4,16 @@ import torch.nn.functional as F
 import torchvision
 import torchvision.transforms as transforms
 import torch.optim as optim
+from torch.utils.tensorboard import SummaryWriter
 
 import numpy as np
 from tqdm import tqdm
-
 import matplotlib.pyplot as plt
+import time
 
 torch.manual_seed(666)
-epoch = 4
+epoch = 10
+writer = SummaryWriter('runs/classifier_experiment_1')
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 transform = transforms.Compose(
@@ -29,27 +31,28 @@ testloader = torch.utils.data.DataLoader(test_set, batch_size=4, shuffle=False, 
 classes = ('plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
 
 
-def show_img(img):
+def show_img(img, show_plot=False, show_tensorboard=False):
     img = img * 0.5 + 0.5  # unnormalize
     npimg = img.numpy()
-    plt.imshow(np.transpose(npimg, (1, 2, 0)))
-    plt.show()
+    if show_plot:
+        plt.imshow(np.transpose(npimg, (1, 2, 0)))
+        plt.show()
+    if show_tensorboard:
+        writer.add_image('train_images', img)
 
 
-def show_case():
+def show_info(net, device, show_plot=False):
     print("=========================================")
+    print("device is: {}".format(device))
+    print("net: {}".format(net))
     print("first mini_batch training data and labels")
     dataiter = iter(trainloader)
     images, labels = dataiter.next()
     label_info = [classes[i] for i in labels]
     print("label: {}".format(label_info))
     print("=========================================")
-    show_img(torchvision.utils.make_grid(images))
-
-
-def show_info(net, device):
-    print("device is: {}".format(device))
-    print("net: {}".format(net))
+    writer.add_graph(net, images)
+    show_img(torchvision.utils.make_grid(images), show_plot=show_plot, show_tensorboard=True)
 
 
 class Net(nn.Module):
@@ -73,22 +76,21 @@ class Net(nn.Module):
         return x
 
 
-def solver(show_label=False):
-    if show_label:
-        show_case()
-
+def solver(show_plot):
     net = Net()
+    show_info(net, device, show_plot)
+
     net.to(device)
-
-    show_info(net, device)
-
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
     bar = tqdm(range(epoch))
+    start_time = time.time()
+
     for index in bar:
         i = 0
         for data in trainloader:
             inputs, labels = data
+
             inputs, labels = inputs.to(device), labels.to(device)
             optimizer.zero_grad()
 
@@ -98,7 +100,10 @@ def solver(show_label=False):
             optimizer.step()
             i += 1
             if i % 100 == 0:
+                writer.add_scalar('training loss', loss, index * len(trainloader) + i)
                 bar.set_description("epoch: {}, index: {}, loss: {}".format(index, i, loss))
+
+    training_end_time = time.time()
 
     correct = 0
     total = 0
@@ -110,8 +115,12 @@ def solver(show_label=False):
             _, predicted = torch.max(outputs.data, 1)
             total += labels.size(0)
             correct += (predicted == labels).sum().item()
+
+    testing_end_time = time.time()
     print('Accuracy of the network on the 10000 test images: %d %%' % (100 * correct / total))
+    print("training elapsed: {}s , testing elapsed: {}s"
+          .format(training_end_time - start_time, testing_end_time - start_time))
 
 
 if __name__ == '__main__':
-    solver()
+    solver(show_plot=False)
