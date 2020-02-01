@@ -1,4 +1,5 @@
-<p align="center"><img width="40%" src="doc/logo.png" /></p>
+<p align="center"><img src="doc/logo.png" /></p>
+
 ---------------------------
 
 # pytorch_quick_start
