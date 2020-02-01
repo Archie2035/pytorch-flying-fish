@@ -1,3 +1,6 @@
+<p align="center"><img width="40%" src="doc/logo.png" /></p>
+---------------------------
+
 # pytorch_quick_start
 作为一个新手，想开始进入深度学习领域做一名炼丹师。通过一个最简的原型来学习一下pytorch的玩法。
 
@@ -29,19 +32,24 @@ training
 python classifier_pipeline.py
 ```
 
+demo
+```
+python classifier_demo_pipeline.py
+```
+
 ## 1.架构
 
 1. [x] 实现简单的Neural Network、支持training、testing
 1. [x] 在GPU下训练
 1. [x] 接入tensorboard
-1. [x] 加入模型导入导出
-1. [x] 加入demo pipeline，进行inference并输出预测结果
+1. [x] 模型导入导出
+1. [x] demo pipeline，进行inference并输出预测结果
+1. [ ] 抽象配置
 1. [ ] 简易的benchmark
 1. [ ] 使用hook重构
 1. [ ] 适配多个数据集
-1. [ ] dataloader 异步加速
-1. [ ] 加入resnet 做为backbone
-1. [ ] 抽象配置文件
+1. [ ] dataloader异步加速
+1. [ ] 加入resnet做为backbone，提高性能
 
 ## 2.实现简单的Neural Network
 通过pytorch的60min教程搭建一个包含conv层maxpooling层以及relu激活函数的nn，官网[链接](https://pytorch.org/tutorials/beginner/blitz/neural_networks_tutorial.html#sphx-glr-beginner-blitz-neural-networks-tutorial-py)
