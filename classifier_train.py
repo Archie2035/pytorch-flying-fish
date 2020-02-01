@@ -1,10 +1,10 @@
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 import torchvision
 import torchvision.transforms as transforms
 import torch.optim as optim
 from torch.utils.tensorboard import SummaryWriter
+from networks.simple_net import SimpleNet
 
 import numpy as np
 from tqdm import tqdm
@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 import time
 
 torch.manual_seed(666)
-epoch = 10
+
 writer = SummaryWriter('runs/classifier_experiment_1')
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -55,29 +55,8 @@ def show_info(net, device, show_plot=False):
     show_img(torchvision.utils.make_grid(images), show_plot=show_plot, show_tensorboard=True)
 
 
-class Net(nn.Module):
-    def __init__(self):
-        super(Net, self).__init__()
-        self.conv1 = nn.Conv2d(3, 6, 5)
-        self.pool = nn.MaxPool2d(2, 2)
-        self.conv2 = nn.Conv2d(6, 16, 5)
-        self.fc1 = nn.Linear(16 * 5 * 5, 100)
-        self.fc2 = nn.Linear(100, 84)
-        self.fc3 = nn.Linear(84, 10)
-
-    def forward(self, x):
-        x = self.conv1(x)
-        x = self.pool(F.relu(x))
-        x = self.pool(F.relu(self.conv2(x)))
-        x = x.view(-1, 16 * 5 * 5)
-        x = F.relu(self.fc1(x))
-        x = F.relu(self.fc2(x))
-        x = F.relu(self.fc3(x))
-        return x
-
-
-def solver(show_plot):
-    net = Net()
+def solver(epoch, model_output_path, show_plot):
+    net = SimpleNet()
     show_info(net, device, show_plot)
 
     net.to(device)
@@ -90,7 +69,6 @@ def solver(show_plot):
         i = 0
         for data in trainloader:
             inputs, labels = data
-
             inputs, labels = inputs.to(device), labels.to(device)
             optimizer.zero_grad()
 
@@ -121,6 +99,10 @@ def solver(show_plot):
     print("training elapsed: {}s , testing elapsed: {}s"
           .format(training_end_time - start_time, testing_end_time - start_time))
 
+    torch.save(net.state_dict(), model_output_path)
+
 
 if __name__ == '__main__':
-    solver(show_plot=False)
+    epoch = 1
+    model_output_path = "./models/cifar10_model.pth"
+    solver(epoch, model_output_path, show_plot=False)

@@ -33,7 +33,9 @@ python classifier_pipeline.py
 
 1. [x] 实现简单的Neural Network、支持training、testing
 1. [x] 在GPU下训练
-1. [x] 接入tensor_board
+1. [x] 接入tensorboard
+1. [x] 加入模型导入导出
+1. [x] 加入demo pipeline，进行inference并输出预测结果
 1. [ ] 简易的benchmark
 1. [ ] 使用hook重构
 1. [ ] 适配多个数据集
@@ -88,5 +90,19 @@ tensorboard --logdir=runs --host=0.0.0.0
 loss示例：
 ![](doc/tensorboard_loss.png)
 
+## 5.模型导出、导入
+模型导出，使用推荐导出方法：
+```
+torch.save(net.state_dict(), model_output_path)
+```
+模型导入，需要和导出方法相匹配：
+```
+net.load_state_dict(torch.load(model_output_path))
+```
+
+## 6.加入demo pipeline
+为了能够单独使用导出的模型，加入了 `classifier_demo_pipeline.py`
+
+为了能够方便的导入模型，将网络的定义单独提取到networks/simple_net中，使得`classifier_train.py`、`classifier_demo_pipeline.py`可以复用网络结构
 
  
