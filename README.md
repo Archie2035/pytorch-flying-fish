@@ -30,12 +30,12 @@ pip install -r requirements.txt
 
 training
 ```
-bash experiments/main.sh
+bash experiments/xxx_train.sh
 ```
 
 demo
 ```
-bash experiments/demo.sh
+bash experiments/xxx_demo.sh
 ```
 
 ![](doc/demo1.png)
