@@ -2,16 +2,13 @@ import torch
 from networks.simple_net import SimpleNet
 import torchvision
 import torchvision.transforms as transforms
-from torch.utils.tensorboard import SummaryWriter
 
 import numpy as np
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 import time
+import argparse
 
-torch.manual_seed(666)
-
-writer = SummaryWriter('runs/classifier_experiment_1')
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 transform = transforms.Compose(
@@ -20,9 +17,15 @@ transform = transforms.Compose(
      ]
 )
 
-test_set = torchvision.datasets.CIFAR10(root='./data', train=False, download=True, transform=transform)
-testloader = torch.utils.data.DataLoader(test_set, batch_size=1, shuffle=False, num_workers=1)
 classes = ('plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(description='Train a Classifier')
+    parser.add_argument('--model_input_path', default='./models/cifar10_model.pth', help='input model path')
+
+    args = parser.parse_args()
+    return args
 
 
 def show_img(img, label, predict, elapsed_time):
@@ -33,9 +36,9 @@ def show_img(img, label, predict, elapsed_time):
     plt.show()
 
 
-def solver(model_output_path):
+def solver(args):
     net = SimpleNet()
-    net.load_state_dict(torch.load(model_output_path))
+    net.load_state_dict(torch.load(args.model_input_path))
     net.to(device)
 
     with torch.no_grad():
@@ -53,5 +56,9 @@ def solver(model_output_path):
 
 
 if __name__ == '__main__':
-    model_input_path = "./models/cifar10_model.pth"
-    solver(model_input_path)
+    args = parse_args()
+
+    test_set = torchvision.datasets.CIFAR10(root='./data', train=False, download=True, transform=transform)
+    testloader = torch.utils.data.DataLoader(test_set, batch_size=1, shuffle=False, num_workers=1)
+
+    solver(args)

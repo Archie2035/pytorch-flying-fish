@@ -2,7 +2,7 @@
 
 ---------------------------
 
-# pytorch_quick_start
+# pytorch-flying-fish 
 作为一个新手，想开始进入深度学习领域做一名炼丹师。通过一个最简的原型来学习一下pytorch的玩法。
 
 ## 0.准备工作
@@ -30,13 +30,15 @@ pip install -r requirements.txt
 
 training
 ```
-python classifier_pipeline.py
+bash experiments/main.sh
 ```
 
 demo
 ```
-python classifier_demo_pipeline.py
+bash experiments/demo.sh
 ```
+
+![](doc/demo1.png)
 
 ## 1.架构
 
@@ -45,12 +47,12 @@ python classifier_demo_pipeline.py
 1. [x] 接入tensorboard
 1. [x] 模型导入导出
 1. [x] demo pipeline，进行inference并输出预测结果
-1. [ ] 抽象配置
+1. [x] 抽象配置
+1. [ ] 加入resnet做为backbone，提高性能
 1. [ ] 简易的benchmark
 1. [ ] 使用hook重构
 1. [ ] 适配多个数据集
 1. [ ] dataloader异步加速
-1. [ ] 加入resnet做为backbone，提高性能
 
 ## 2.实现简单的Neural Network
 通过pytorch的60min教程搭建一个包含conv层maxpooling层以及relu激活函数的nn，官网[链接](https://pytorch.org/tutorials/beginner/blitz/neural_networks_tutorial.html#sphx-glr-beginner-blitz-neural-networks-tutorial-py)
@@ -114,4 +116,7 @@ net.load_state_dict(torch.load(model_output_path))
 
 为了能够方便的导入模型，将网络的定义单独提取到networks/simple_net中，使得`classifier_train.py`、`classifier_demo_pipeline.py`可以复用网络结构
 
+## 7.抽象配置
+使用argparse对配置进行抽象，仿照了[centernet](https://github.com/xingyizhou/CenterNet/tree/master/experiments)对配置进行了抽象，
+并仿照其目录结构对项目的train、demo两步进行了分离
  
