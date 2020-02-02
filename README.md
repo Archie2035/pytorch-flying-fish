@@ -40,6 +40,7 @@ bash experiments/demo.sh
 
 ![](doc/demo1.png)
 
+
 ## 1.架构
 
 1. [x] 实现简单的Neural Network、支持training、testing
@@ -119,4 +120,3 @@ net.load_state_dict(torch.load(model_output_path))
 ## 7.抽象配置
 使用argparse对配置进行抽象，仿照了[centernet](https://github.com/xingyizhou/CenterNet/tree/master/experiments)对配置进行了抽象，
 并仿照其目录结构对项目的train、demo两步进行了分离
- 
