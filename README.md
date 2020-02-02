@@ -8,8 +8,8 @@
 ## 0.准备工作
 使用conda创建虚拟环境
 ```
-conda create -n pytorch-qs python=3.7 -y
-conda activate pytorch-qs
+conda create -n pytorch-ff python=3.7 -y
+conda activate pytorch-ff
 ```
 
 安装PyTorch and torchvision，参照[官网](https://pytorch.org/),例如：

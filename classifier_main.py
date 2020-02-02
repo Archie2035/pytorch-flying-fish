@@ -4,7 +4,7 @@ import torchvision
 import torchvision.transforms as transforms
 import torch.optim as optim
 from torch.utils.tensorboard import SummaryWriter
-from networks.simple_net import SimpleNet
+from networks.flying_fish_net import get_flying_fish_net, get_simple_net
 
 import numpy as np
 from tqdm import tqdm
@@ -23,6 +23,8 @@ classes = ('plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship'
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Train a Classifier')
+    parser.add_argument('--batch_size', type=int, default=4, help='mini_batch_size')
+    parser.add_argument('--backbone', default='', help='backbone, e.g. resnet18、resnet50、resnet101...')
     parser.add_argument('--seed', type=int, default=666, help='random seed')
     parser.add_argument('--lr', type=float, default=0.001, help='learning rate')
     parser.add_argument('--epoch', type=int, default=1, help='epoch')
@@ -58,10 +60,13 @@ def show_info(net, device, show_plot=False):
 
 
 def solver(args):
-    net = SimpleNet()
+    if args.backbone:
+        net = get_flying_fish_net(args.backbone)
+    else:
+        net = get_simple_net()
     show_info(net, device, args.show_plot)
-
     net.to(device)
+
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.SGD(net.parameters(), lr=args.lr, momentum=0.9)
     bar = tqdm(range(args.epoch))
@@ -114,10 +119,10 @@ if __name__ == '__main__':
     )
 
     train_set = torchvision.datasets.CIFAR10(root='./data', train=True, download=True, transform=transform)
-    trainloader = torch.utils.data.DataLoader(train_set, batch_size=4, shuffle=True, num_workers=2)
+    trainloader = torch.utils.data.DataLoader(train_set, batch_size=args.batch_size, shuffle=True, num_workers=8)
 
     test_set = torchvision.datasets.CIFAR10(root='./data', train=False, download=True, transform=transform)
-    testloader = torch.utils.data.DataLoader(test_set, batch_size=4, shuffle=False, num_workers=2)
+    testloader = torch.utils.data.DataLoader(test_set, batch_size=args.batch_size, shuffle=False, num_workers=8)
 
     torch.manual_seed(args.seed)
 
