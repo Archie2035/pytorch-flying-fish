@@ -40,6 +40,7 @@ bash experiments/demo.sh
 
 ![](doc/demo1.png)
 
+
 ## 1.架构
 
 1. [x] 实现简单的Neural Network、支持training、testing
