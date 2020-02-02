@@ -1,2 +1,6 @@
 data
+runs
+.idea
 *.pyc
+*.pth
+*.pt
