@@ -49,7 +49,7 @@ bash experiments/xxx_demo.sh
 1. [x] 模型导入导出
 1. [x] demo pipeline，进行inference并输出预测结果
 1. [x] 抽象配置
-1. [ ] 加入resnet做为backbone，提高性能
+1. [x] 加入resnet做为backbone，提高性能
 1. [ ] 简易的benchmark
 1. [ ] 使用hook重构
 1. [ ] 适配多个数据集
@@ -120,3 +120,21 @@ net.load_state_dict(torch.load(model_output_path))
 ## 7.抽象配置
 使用argparse对配置进行抽象，仿照了[centernet](https://github.com/xingyizhou/CenterNet/tree/master/experiments)对配置进行了抽象，
 并仿照其目录结构对项目的train、demo两步进行了分离
+
+## 8.加入backbone
+引入了resnet，并修改conv1层的输入参数，以及最后fc层。
+```
+backbone_dict = {
+    "resnet18": torchvision.models.resnet18(pretrained=True),
+    "resnet34": torchvision.models.resnet34(pretrained=True),
+    "resnet50": torchvision.models.resnet50(pretrained=True),
+    "resnet101": torchvision.models.resnet101(pretrained=True)
+}
+if resnet_name in backbone_dict:
+    net = backbone_dict[resnet_name]
+    net.conv1 = nn.Conv2d(3, 64, 5)
+    num_ftrs = net.fc.in_features
+    net.fc = nn.Linear(num_ftrs, 10)
+    return net
+```
+目前准确率可以达到86%。
