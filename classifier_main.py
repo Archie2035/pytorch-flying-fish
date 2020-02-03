@@ -1,11 +1,3 @@
-import torch
-import torch.nn as nn
-import torchvision
-import torchvision.transforms as transforms
-import torch.optim as optim
-from torch.utils.tensorboard import SummaryWriter
-from networks.flying_fish_net import get_flying_fish_net, get_simple_net
-
 import numpy as np
 from tqdm import tqdm
 import matplotlib.pyplot as plt
@@ -13,6 +5,13 @@ import time
 from datetime import datetime
 import argparse
 
+import torch
+import torch.nn as nn
+import torchvision
+import torchvision.transforms as transforms
+import torch.optim as optim
+from torch.utils.tensorboard import SummaryWriter
+from networks.flying_fish_net import get_flying_fish_net, get_simple_net
 
 time_str = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
 
@@ -119,10 +118,10 @@ if __name__ == '__main__':
     )
 
     train_set = torchvision.datasets.CIFAR10(root='./data', train=True, download=True, transform=transform)
-    trainloader = torch.utils.data.DataLoader(train_set, batch_size=args.batch_size, shuffle=True, num_workers=8)
+    trainloader = torch.utils.data.DataLoader(train_set, batch_size=args.batch_size, shuffle=True, num_workers=4, pin_memory=True)
 
     test_set = torchvision.datasets.CIFAR10(root='./data', train=False, download=True, transform=transform)
-    testloader = torch.utils.data.DataLoader(test_set, batch_size=args.batch_size, shuffle=False, num_workers=8)
+    testloader = torch.utils.data.DataLoader(test_set, batch_size=args.batch_size, shuffle=False, num_workers=4, pin_memory=True)
 
     torch.manual_seed(args.seed)
 

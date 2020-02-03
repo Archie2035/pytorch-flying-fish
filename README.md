@@ -50,10 +50,7 @@ bash experiments/xxx_demo.sh
 1. [x] demo pipeline，进行inference并输出预测结果
 1. [x] 抽象配置
 1. [x] 加入resnet做为backbone，提高性能
-1. [ ] 简易的benchmark
-1. [ ] 使用hook重构
-1. [ ] 适配多个数据集
-1. [ ] dataloader异步加速
+1. [x] 简易的benchmark
 
 ## 2.实现简单的Neural Network
 通过pytorch的60min教程搭建一个包含conv层maxpooling层以及relu激活函数的nn，官网[链接](https://pytorch.org/tutorials/beginner/blitz/neural_networks_tutorial.html#sphx-glr-beginner-blitz-neural-networks-tutorial-py)
@@ -138,3 +135,20 @@ if resnet_name in backbone_dict:
     return net
 ```
 目前准确率可以达到86%。
+
+## 9.benchamrk
+用测试集进行预测，与真值对比。
+
+>（Accuracy） = Number of correct predictions / Total number of predictions
+
+```
+with torch.no_grad():
+    for data in testloader:
+        inputs, labels = data
+        inputs, labels = inputs.to(device), labels.to(device)
+        outputs = net(inputs)
+        _, predicted = torch.max(outputs.data, 1)
+        total += labels.size(0)
+        correct += (predicted == labels).sum().item()
+accuracy = 100 * correct / total
+```
